@@ -45,18 +45,28 @@ def player_script(cannon_pos, ball_pos, power_bullet_count, precision_bullet_cou
     # Define the target position
     target_x, target_y = ball_pos
 
-    # Placeholder logic to calculate shooting parameters
-    not_shooting = False  # Set to True if the cannon chooses not to shoot
-    if(cannon_x<WIDTH/2):
-        angle = random.uniform(-90, 90)  # Random angle to shoot in
+    # Calculate the angle to aim the cannon at the ball's position
+    delta_x = target_x - cannon_x
+    delta_y = target_y - cannon_y
+    angle =- math.degrees(math.atan2(delta_y, delta_x))  # Angle in degrees
+    
+    # Calculate the distance to the ball
+    distance = math.sqrt(delta_x ** 2 + delta_y ** 2)
+
+    # Calculate the required power based on the distance
+    # The further the ball, the higher the power needed
+    power = min(MAX_POWER, int(distance / 20))  # Scale power based on distance
+
+    # Choose the bullet type
+    # If power bullets are available and the distance is large, use a power bullet
+    if power_bullet_count > 0 and distance > 150:
+        bullet_type = "power"
+    # If precision bullets are available and the distance is smaller, use a precision bullet
+    elif precision_bullet_count > 0 and distance < 150:
+        bullet_type = "precision"
+    # Otherwise, use whichever bullet is available (random choice between power and precision)
     else:
-        angle = random.uniform(90, 270)
-    power = random.randint(5, MAX_POWER)  # Random power level for the shot
-    bullet_type = random.choice(["power", "precision"])  # Random bullet type
+        bullet_type = random.choice(["power", "precision"])
 
-    # Decide whether to shoot or not
-    if not_shooting:
-        return None  # Do not shoot
-
-    # Return the shooting parameters
+    # Return the calculated parameters for shooting
     return (angle, power, bullet_type)
